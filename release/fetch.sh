@@ -10,7 +10,8 @@ HERE="$(cd "$(dirname "$0")" && pwd)"
 ROOT="$(cd "$HERE/.." && pwd)"
 [ $# -ge 1 ] || { echo "usage: $0 <tag> [dest_dir]" >&2; exit 2; }
 TAG="$1"; DEST="$(cd "${2:-.}" && pwd)"
-REPO="$(gh repo view --json nameWithOwner -q .nameWithOwner)"
+# Target the fork explicitly via the `origin` URL (gh defaults a fork to its parent).
+REPO="${REPO:-$(git -C "$ROOT" remote get-url origin | sed -E 's#(git@|https://)github\.com[:/]##; s#\.git$##')}"
 TMP="$ROOT/release_build/dl/$TAG"; mkdir -p "$TMP"
 
 echo ">> downloading $TAG assets from $REPO ..."

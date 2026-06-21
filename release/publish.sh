@@ -16,7 +16,8 @@ ROOT="$(cd "$HERE/.." && pwd)"
 
 [ $# -ge 4 ] || { echo "usage: $0 <tag> <title> <base_dir> <item>..." >&2; exit 2; }
 TAG="$1"; TITLE="$2"; BASE="$(cd "$3" && pwd)"; shift 3
-REPO="$(gh repo view --json nameWithOwner -q .nameWithOwner)"
+# Target the fork explicitly via the `origin` URL (gh defaults a fork to its parent).
+REPO="${REPO:-$(git -C "$ROOT" remote get-url origin | sed -E 's#(git@|https://)github\.com[:/]##; s#\.git$##')}"
 WORK="$ROOT/release_build/$TAG"
 mkdir -p "$WORK/lists"
 
@@ -50,9 +51,9 @@ for lst in "$WORK"/lists/group-*.lst; do
 
   n="$(tr -cd '\0' < "$lst" | wc -c)"
   echo ">> [$idx] tar $n item(s) -> $asset"
-  tar --null -T "$lst" -C "$BASE" \
+  tar --create --file "$WORK/$asset" --directory "$BASE" \
       --exclude='.DS_Store' --exclude='__pycache__' --exclude='.ipynb_checkpoints' \
-      -cf "$WORK/$asset"
+      --null --files-from "$lst"
   ( cd "$WORK" && sha256sum "$asset" > "${asset}.sha256" )
   echo ">> [$idx] upload $(du -h "$WORK/$asset" | cut -f1) ..."
   gh release upload "$TAG" "$WORK/$asset" "$WORK/${asset}.sha256" --repo "$REPO" --clobber
