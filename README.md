@@ -83,6 +83,27 @@ Please find the results and models in this [google drive](https://drive.google.c
 
 - [X] We will release the pre-trained models soon.
 
+## Pre-trained models & data mirror (GitHub Releases)
+
+In addition to the Google Drive above, the trained checkpoints/renders and the
+DTU data used here are mirrored as GitHub Release assets on this fork. Whole
+scenes are bundled into the fewest tar archives (each < 2 GiB; no file is
+byte-split), each with a SHA-256 checksum. Restore any of them with:
+
+```
+release/fetch.sh <tag> <dest>     # requires the `gh` CLI and network access
+```
+
+| Tag | Restores into | Contents |
+|---|---|---|
+| `pretrained-models-v1` | `.` | `out/` checkpoints + renders, `wandb/` |
+| `dtu-rectified-v1` | `data` | `data/Rectified/` (DTU, 124 scans) |
+| `dtu-sampleset-v1` | `data` | `data/SampleSet/` |
+| `dtu-aux-v1` | `data` | `submission_data/`, `Calibration/`, `scan114/` |
+
+The DTU data is third-party — see each release's notes for attribution/license.
+Packaging tooling lives in `release/` (`publish.sh` to create, `fetch.sh` to restore).
+
 ## Citation
 
 If you find our work useful, please cite it as

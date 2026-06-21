@@ -11,3 +11,7 @@ __pycache__
 *.ipynb_checkpoints
 *.tar.gz
 debug*
+
+# release packaging scratch (tarballs are uploaded to GitHub Releases, never git)
+release_build/
+*.tar
