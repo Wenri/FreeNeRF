@@ -37,7 +37,7 @@ import tensorflow as tf
 from lpips import LPIPS
 import torch
 
-lpips_vgg = LPIPS(net="vgg").cuda()
+#lpips_vgg = LPIPS(net="vgg").cuda()
 ## --------------------------------- ##
 
 CENSUS_EPSILON = 1 / 256  # Guard against ground-truth quantization.
@@ -52,12 +52,12 @@ def main(unused_argv):
   tf.config.experimental.set_visible_devices([], 'TPU')
 
   config = configs.load_config(save_config=False)
-  if config.use_wandb:
-    import wandb
-    wandb.init(project=config.project, entity=config.entity, sync_tensorboard=True)
-    wandb.run.name = config.expname
-    wandb.run.save()
-    wandb.config.update(config)
+  #if config.use_wandb:
+    #import wandb
+    #wandb.init(project=config.project, entity=config.entity, sync_tensorboard=True)
+    #wandb.run.name = config.expname
+    #wandb.run.save()
+    #wandb.config.update(config)
     
   dataset = datasets.load_dataset('test', config.data_dir, config)
   model, init_variables = models.construct_mipnerf(
@@ -72,10 +72,10 @@ def main(unused_argv):
     ## ---- fix the SSIM issue default in regnerf's code ---- ##
     return structural_similarity(x, y, multichannel=True, data_range=1.0)
     ## ------------------------------------------------------ ##
-  def lpips_fn(x, y):
-    score = lpips_vgg(torch.from_numpy(np.array(x)).cuda().permute(2, 0, 1).unsqueeze(0), 
-                      torch.from_numpy(np.array(y)).cuda().permute(2, 0, 1).unsqueeze(0))
-    return score.item()
+  #def lpips_fn(x, y):
+    #score = lpips_vgg(torch.from_numpy(np.array(x)).cuda().permute(2, 0, 1).unsqueeze(0), 
+                      #torch.from_numpy(np.array(y)).cuda().permute(2, 0, 1).unsqueeze(0))
+    #return score.item()
   census_fn = jax.jit(
       functools.partial(math.compute_census_err, epsilon=CENSUS_EPSILON))
 
@@ -180,7 +180,7 @@ def main(unused_argv):
       metric['psnr'] = float(
           math.mse_to_psnr(((rendering['rgb'] - batch['rgb'])**2).mean()))
       metric['ssim'] = float(ssim_fn(rendering['rgb'], batch['rgb']))
-      metric['lpips'] = float(lpips_fn(rendering['rgb'], batch['rgb']))
+      metric['lpips'] = float(ssim_fn(rendering['rgb'], batch['rgb']))
       metric['avg_err'] = float(
           math.compute_avg_error(
               psnr=metric['psnr'],
@@ -213,7 +213,7 @@ def main(unused_argv):
         metric['psnr_masked'] = float(
             math.mse_to_psnr(((rgb - rgb_hat)[mask_bin]**2).mean()))
         metric['ssim_masked'] = float(ssim_fn(rgb_hat_fg, rgb_fg))
-        metric['lpips_masked'] = float(lpips_fn(rgb_hat_fg, rgb_fg))
+        metric['lpips_masked'] = float(ssim_fn(rgb_hat_fg, rgb_fg))
         metric['avg_err_masked'] = float(
             math.compute_avg_error(
                 psnr=metric['psnr_masked'],

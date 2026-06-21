@@ -1,11 +1,11 @@
 
 Config.expname = "myexp"
 Config.checkpoint_dir = "out/myexp"
-Config.dtu_scan = "scan8"
+Config.dtu_scan = "scan114"
 
 # basic configs
-Config.data_dir = "data/Rectified/images"
-Config.dtu_mask_path = "data/Rectified/mask"
+Config.data_dir = "data/Rectified"
+Config.dtu_mask_path = "data/submission_data/mask"
 Config.dataset_loader = 'dtu'
 Config.white_background = False
 Config.near = 0.5
